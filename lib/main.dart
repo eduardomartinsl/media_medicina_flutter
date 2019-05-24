@@ -21,7 +21,7 @@ class _HomeState extends State<Home> {
 
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  String _mediaFinal = "Média final: ";
+  String _mediaFinal = "";
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +30,8 @@ class _HomeState extends State<Home> {
         title: Text("Cálculo de média"),
         centerTitle: true,
         actions: <Widget>[
-          IconButton(icon: Icon(Icons.refresh), onPressed: _resetFields)
+          IconButton(icon: Icon(Icons.refresh), onPressed: _resetFields),
+          IconButton(icon: Icon(Icons.info), onPressed:_informacao)
         ],
         backgroundColor: Colors.lightGreen,
       ),
@@ -69,6 +70,38 @@ class _HomeState extends State<Home> {
               ),
             ),
           )),
+    );
+  }
+
+  Future<void> _informacao() async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Média geométria ponderada'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Este app utiliza o cálculo da média geométrica ponderada para realização da média final'),
+                Text('Os pesos são (Por padrão):'),
+                Divider(),
+                Text('Prova - peso 5'),
+                Text('Tutoria - peso 2'),
+                Text('Prática - peso 2'),
+                Text('Seminário - peso 1'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
