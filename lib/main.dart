@@ -1,5 +1,5 @@
 import 'dart:math';
-
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -25,13 +25,16 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]
+    );
     return Scaffold(
       appBar: AppBar(
         title: Text("Cálculo de média"),
         centerTitle: true,
         actions: <Widget>[
           IconButton(icon: Icon(Icons.refresh), onPressed: _resetFields),
-          IconButton(icon: Icon(Icons.info), onPressed:_informacao)
+          IconButton(icon: Icon(Icons.info), onPressed: _informacao)
         ],
         backgroundColor: Colors.lightGreen,
       ),
@@ -82,7 +85,8 @@ class _HomeState extends State<Home> {
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text('Este app utiliza o cálculo da média geométrica ponderada para realização da média final'),
+                Text(
+                    'Este app utiliza o cálculo da média geométrica ponderada para realização da média final'),
                 Text('Os pesos são (Por padrão):'),
                 Divider(),
                 Text('Prova - peso 5'),
@@ -117,9 +121,7 @@ class _HomeState extends State<Home> {
         decoration: InputDecoration(
             labelText: termo,
             hintText: "Digite a nota $termo",
-            labelStyle: TextStyle(color: Colors.lightGreen)
-        )
-    );
+            labelStyle: TextStyle(color: Colors.lightGreen)));
   }
 
   void _resetFields() {
