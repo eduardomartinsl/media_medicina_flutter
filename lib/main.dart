@@ -19,6 +19,16 @@ class _HomeState extends State<Home> {
   TextEditingController txtPratica = new TextEditingController();
   TextEditingController txtSeminario = new TextEditingController();
 
+  TextEditingController pesoProvaController = new TextEditingController();
+  TextEditingController pesoTutoriaController = new TextEditingController();
+  TextEditingController pesoPraticaController = new TextEditingController();
+  TextEditingController pesoSeminarioController = new TextEditingController();
+
+  double pesoProva = 5;
+  double pesoTutoria = 2;
+  double pesoPratica = 2;
+  double pesoSeminario = 1;
+
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   String _mediaFinal = "";
@@ -26,12 +36,10 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations(
-        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]
-    );
+        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     return Scaffold(
       appBar: AppBar(
         title: Text("Cálculo de média"),
-        centerTitle: true,
         actions: <Widget>[
           IconButton(icon: Icon(Icons.refresh), onPressed: _resetFields),
           IconButton(icon: Icon(Icons.info), onPressed: _informacao)
@@ -46,13 +54,20 @@ class _HomeState extends State<Home> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  _textFieldGenerator("Prova", txtProva),
+                  Row(
+                    children: <Widget>[],
+                  ),
+                  _rowGenerator(
+                      "Prova", pesoProva, txtProva, pesoProvaController),
                   Divider(),
-                  _textFieldGenerator("Tutoria", txtTutoria),
+                  _rowGenerator("Tutoria", pesoTutoria, txtTutoria,
+                      pesoTutoriaController),
                   Divider(),
-                  _textFieldGenerator("Prática", txtPratica),
+                  _rowGenerator("Prática", pesoPratica, txtPratica,
+                      pesoPraticaController),
                   Divider(),
-                  _textFieldGenerator("Seminário", txtSeminario),
+                  _rowGenerator("Seminário", pesoSeminario, txtSeminario,
+                      pesoSeminarioController),
                   Divider(),
                   RaisedButton(
                     child: Text(
@@ -89,10 +104,10 @@ class _HomeState extends State<Home> {
                     'Este app utiliza o cálculo da média geométrica ponderada para realização da média final'),
                 Text('Os pesos são (Por padrão):'),
                 Divider(),
-                Text('Prova - peso 5'),
-                Text('Tutoria - peso 2'),
-                Text('Prática - peso 2'),
-                Text('Seminário - peso 1'),
+                Text('Prova - peso $pesoProva'),
+                Text('Tutoria - peso $pesoTutoria'),
+                Text('Prática - peso $pesoPratica'),
+                Text('Seminário - peso $pesoSeminario'),
               ],
             ),
           ),
@@ -109,19 +124,67 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _textFieldGenerator(String termo, TextEditingController ccontroller) {
-    return TextFormField(
-        controller: ccontroller,
-        validator: (value) {
-          if (value.isEmpty) {
-            return "Insira o valor $termo";
-          }
-        },
-        keyboardType: TextInputType.numberWithOptions(),
-        decoration: InputDecoration(
-            labelText: termo,
-            hintText: "Digite a nota $termo",
-            labelStyle: TextStyle(color: Colors.lightGreen)));
+  Widget _rowGenerator(
+      String termo,
+      double multiplicador,
+      TextEditingController ccontroller,
+      TextEditingController pesoController) {
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: TextFormField(
+            controller: ccontroller,
+            validator: (value) {
+              if (value.isEmpty) {
+                return "Insira o valor $termo";
+              }
+            },
+            keyboardType: TextInputType.numberWithOptions(),
+            decoration: InputDecoration(
+                labelText: termo,
+                hintText: "Digite a nota $termo",
+                labelStyle: TextStyle(color: Colors.lightGreen)),
+          ),
+        ),
+        FlatButton(
+          child: Text("x${multiplicador.toString()}",
+              style: TextStyle(color: Colors.white)),
+          onPressed: () {
+            _alteraPeso(termo, pesoController, multiplicador);
+          },
+          color: Colors.lightGreen,
+        )
+      ],
+    );
+  }
+
+  Future<void> _alteraPeso(
+      String pesoAlteravel,
+      TextEditingController controllerPeso,
+      double multiplicador) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext) {
+          return AlertDialog(
+            title: Text("Alterar peso"),
+            content: TextField(
+              controller: controllerPeso,
+              decoration: InputDecoration(
+                  hintText: "Digite o novo peso de $pesoAlteravel"),
+            ),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text('Alterar',
+                    style: TextStyle(color: Colors.lightGreen)),
+                onPressed: () {
+                  var a = controllerPeso.text;
+                  multiplicador = double.parse(controllerPeso.text);
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        });
   }
 
   void _resetFields() {
@@ -137,10 +200,11 @@ class _HomeState extends State<Home> {
 
   void _calculaMedia() {
     setState(() {
-      double provaReal = pow(double.parse(txtProva.text), 5);
-      double tutoriaReal = pow(double.parse(txtTutoria.text), 2);
-      double praticaReal = pow(double.parse(txtPratica.text), 2);
-      double seminarioReal = pow(double.parse(txtSeminario.text), 1);
+      double provaReal = pow(double.parse(txtProva.text), pesoProva);
+      double tutoriaReal = pow(double.parse(txtTutoria.text), pesoTutoria);
+      double praticaReal = pow(double.parse(txtPratica.text), pesoPratica);
+      double seminarioReal =
+          pow(double.parse(txtSeminario.text), pesoSeminario);
 
       double mediaFinal = _raizDecimaDeValores(
           provaReal * tutoriaReal * praticaReal * seminarioReal);
